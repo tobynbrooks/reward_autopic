@@ -4,52 +4,25 @@
   "description": "A rewards app for tyre and car services - Starbucks-inspired system",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "eject": "expo eject",
-    "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/vector-icons": "^15.0.2",
-    "@hookform/resolvers": "^5.2.2",
-    "@react-native-async-storage/async-storage": "^2.2.0",
-    "@react-navigation/bottom-tabs": "^7.4.7",
-    "@react-navigation/native": "^7.1.17",
-    "@react-navigation/stack": "^7.4.8",
-    "expo": "~52.0.11",
-    "expo-linear-gradient": "~14.0.1",
-    "expo-notifications": "~0.32.11",
-    "expo-status-bar": "~2.0.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-hook-form": "^7.63.0",
-    "react-native": "0.76.3",
-    "react-native-gesture-handler": "~2.20.2",
-    "react-native-safe-area-context": "4.12.0",
-    "react-native-screens": "3.35.0",
-    "react-native-web": "~0.19.12",
-    "yup": "^1.7.1"
+    "expo": "~51.0.28",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
+    "react-native-safe-area-context": "4.10.5",
+    "react-native-gesture-handler": "~2.16.1",
+    "@expo/vector-icons": "^14.0.3",
+    "@react-native-async-storage/async-storage": "1.23.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/jest": "^29.5.12",
-    "@types/react": "~18.3.12",
-    "@types/react-test-renderer": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.7.0",
-    "@typescript-eslint/parser": "^7.7.0",
-    "eslint": "^8.57.0",
-    "eslint-config-expo": "^7.1.2",
-    "jest": "^29.4.0",
-    "jest-expo": "~52.0.1",
-    "react-test-renderer": "18.3.1",
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
     "typescript": "~5.3.3"
-  },
-  "jest": {
-    "preset": "jest-expo"
   },
   "private": true
 }
