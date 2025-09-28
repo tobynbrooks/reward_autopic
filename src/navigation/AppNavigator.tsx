@@ -11,6 +11,7 @@ import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 
 import { colors } from '../styles/theme';
+import { useAuth } from '../contexts/AuthContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -74,8 +75,9 @@ const TabNavigator = () => (
 );
 
 const AppNavigator = () => {
-  const isAuthenticated = true; // Mock authentication status
-  const hasCompletedOnboarding = true; // Mock onboarding status
+  const { isAuthenticated, hasCompletedOnboarding } = useAuth();
+  
+  console.log('AppNavigator: isAuthenticated =', isAuthenticated, 'hasCompletedOnboarding =', hasCompletedOnboarding);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -84,6 +86,8 @@ const AppNavigator = () => {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         </>
+      ) : !hasCompletedOnboarding ? (
+        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       ) : (
         <Stack.Screen name="Main" component={TabNavigator} />
       )}

@@ -9,7 +9,9 @@ import {
 
 import Button from '../components/Button';
 import Input from '../components/Input';
+import Banner from '../components/Banner';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { useAuth } from '../contexts/AuthContext';
 
 interface OnboardingData {
   name: string;
@@ -26,6 +28,7 @@ const OnboardingScreen: React.FC = () => {
     carRegistration: '',
     notificationsEnabled: true,
   });
+  const { completeOnboarding } = useAuth();
 
   const handleNext = () => {
     if (step === 1 && !data.name.trim()) {
@@ -58,7 +61,9 @@ const OnboardingScreen: React.FC = () => {
     Alert.alert(
       'Welcome!',
       'Your account has been created successfully. You can now start earning tyres!',
-      [{ text: 'Get Started', onPress: () => console.log('Navigate to main app') }]
+      [{ text: 'Get Started', onPress: () => {
+        completeOnboarding(); // This will set hasCompletedOnboarding to true and navigate to main app
+      }}]
     );
   };
 
@@ -120,9 +125,9 @@ const OnboardingScreen: React.FC = () => {
       case 4:
         return (
           <View style={styles.stepContainer}>
-            <Text style={styles.stepTitle}>Stay in the loop</Text>
+            <Text style={styles.stepTitle}>Our goal is to keep you driving safely, and for less money.</Text>
             <Text style={styles.stepDescription}>
-              Get notifications about new tyres, rewards, and special offers
+              We wont bombard you.
             </Text>
             <View style={styles.notificationCard}>
               <Text style={styles.notificationTitle}>🔔 Enable Notifications</Text>
@@ -158,21 +163,7 @@ const OnboardingScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>🏎️ Welcome to Tyre Rewards</Text>
-        <View style={styles.progressContainer}>
-          {[1, 2, 3, 4].map((num) => (
-            <View
-              key={num}
-              style={[
-                styles.progressDot,
-                step >= num ? styles.progressDotActive : styles.progressDotInactive
-              ]}
-            />
-          ))}
-        </View>
-        <Text style={styles.stepCounter}>Step {step} of 4</Text>
-      </View>
+      <Banner currentStep={step} totalSteps={4} />
 
       {/* Content */}
       <View style={styles.content}>
@@ -204,40 +195,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white,
-  },
-  header: {
-    backgroundColor: colors.primary,
-    paddingTop: 20,
-    paddingBottom: 32,
-    paddingHorizontal: spacing.md,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.white,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    marginBottom: spacing.md,
-  },
-  progressDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginHorizontal: spacing.xs,
-  },
-  progressDotActive: {
-    backgroundColor: colors.accent,
-  },
-  progressDotInactive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  stepCounter: {
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.8)',
   },
   content: {
     flex: 1,

@@ -6,15 +6,18 @@ import {
   SafeAreaView,
   Alert,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email.trim()) {
@@ -57,17 +60,31 @@ const LoginScreen: React.FC = () => {
     );
   };
 
+  const handleDevLogin = () => {
+    console.log('Dev login button pressed');
+    Alert.alert(
+      'Dev Login',
+      'Bypassing authentication for demo purposes.',
+      [{ text: 'Continue', onPress: () => {
+        console.log('Calling login function');
+        login(); // This will set isAuthenticated to true and navigate to onboarding/main app
+        console.log('Login function called');
+      }}]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>🏎️</Text>
-        <Text style={styles.title}>Tyre Rewards</Text>
+        <Text style={styles.brandTitle}>Autopic</Text>
+        <Text style={styles.brandSubtitle}>by Best Autocentres</Text>
+        <Text style={styles.tagline}>Safer miles. Bigger smiles. Better rewards.</Text>
         <Text style={styles.subtitle}>Sign in to your account</Text>
       </View>
 
       {/* Content */}
-      <View style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.formCard}>
           <Text style={styles.formTitle}>Welcome Back</Text>
           <Text style={styles.formDescription}>
@@ -120,6 +137,27 @@ const LoginScreen: React.FC = () => {
           />
         </View>
 
+        {/* Dev Login */}
+        <View style={styles.devCard}>
+          <Button
+            title="🔧 Dev Login (Demo)"
+            onPress={handleDevLogin}
+            variant="secondary"
+            fullWidth
+            style={styles.devButton}
+          />
+          <Button
+            title="🚀 Direct Login (Web Test)"
+            onPress={() => {
+              console.log('Direct login pressed');
+              login();
+            }}
+            variant="ghost"
+            fullWidth
+            style={styles.devButtonSecond}
+          />
+        </View>
+
         {/* Features */}
         <View style={styles.featuresCard}>
           <Text style={styles.featuresTitle}>Why join Tyre Rewards?</Text>
@@ -130,7 +168,7 @@ const LoginScreen: React.FC = () => {
             <Text style={styles.featureItem}>📱 Track your balance easily</Text>
           </View>
         </View>
-      </View>
+      </ScrollView>
 
       {/* Footer */}
       <View style={styles.footer}>
@@ -154,22 +192,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     alignItems: 'center',
   },
-  logo: {
-    fontSize: 64,
-    marginBottom: spacing.md,
-  },
-  title: {
+  brandTitle: {
     fontSize: typography.fontSize['4xl'],
     fontWeight: typography.fontWeight.bold,
     color: colors.white,
+    marginBottom: spacing.xs,
+    textAlign: 'center',
+  },
+  brandSubtitle: {
+    fontSize: typography.fontSize.base,
+    color: 'rgba(255, 255, 255, 0.8)',
     marginBottom: spacing.sm,
+    textAlign: 'center',
+  },
+  tagline: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.medium,
+    color: colors.accent,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   subtitle: {
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.base,
     color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
   },
   content: {
-    flex: 1,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.xl,
   },
@@ -233,6 +282,23 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     width: '100%',
+  },
+  devCard: {
+    backgroundColor: colors.backgroundTertiary,
+    padding: spacing.md,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+  },
+  devButton: {
+    width: '100%',
+  },
+  devButtonSecond: {
+    width: '100%',
+    marginTop: spacing.sm,
   },
   featuresCard: {
     backgroundColor: colors.backgroundTertiary,

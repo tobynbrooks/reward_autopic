@@ -77,17 +77,13 @@ const HomeScreen: React.FC = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Balance Widget */}
         <View style={styles.balanceCard}>
+          <Text style={styles.brandTitle}>Autopic</Text>
+          <Text style={styles.brandSubtitle}>by Best Autocentres</Text>
           <Text style={styles.balanceTitle}>Your Tyre Balance</Text>
-          <View style={styles.balanceRow}>
-            <View style={styles.tyreDisplay}>
-              <Text style={styles.tyreIcon}>🏎️</Text>
-              <Text style={styles.tyreCount}>{currentTyres}</Text>
-              <Text style={styles.tyreLabel}>{currentTyres === 1 ? 'Tyre' : 'Tyres'}</Text>
-            </View>
-            <View style={styles.creditDisplay}>
-              <Text style={styles.creditValue}>{formatCurrency(calculation.creditValue)}</Text>
-              <Text style={styles.creditLabel}>Credit Value</Text>
-            </View>
+          <View style={styles.tyreDisplay}>
+            <Text style={styles.tyreIcon}> </Text>
+            <Text style={styles.tyreCount}>{currentTyres}</Text>
+            <Text style={styles.tyreLabel}>{currentTyres === 1 ? 'Tyre' : 'Tyres'}</Text>
           </View>
           
           <View style={styles.statusRow}>
@@ -175,6 +171,19 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     ...shadows.lg,
   },
+  brandTitle: {
+    fontSize: typography.fontSize['2xl'],
+    fontWeight: typography.fontWeight.bold,
+    color: colors.white,
+    textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  brandSubtitle: {
+    fontSize: typography.fontSize.sm,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginBottom: spacing.lg,
+  },
   balanceTitle: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.semiBold,
@@ -182,14 +191,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     textAlign: 'center',
   },
-  balanceRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
   tyreDisplay: {
     alignItems: 'center',
+    marginBottom: spacing.lg,
   },
   tyreIcon: {
     fontSize: 40,
@@ -203,18 +207,6 @@ const styles = StyleSheet.create({
   tyreLabel: {
     fontSize: typography.fontSize.base,
     color: 'rgba(255, 255, 255, 0.9)',
-  },
-  creditDisplay: {
-    alignItems: 'center',
-  },
-  creditValue: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.accent,
-  },
-  creditLabel: {
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.8)',
   },
   statusRow: {
     alignItems: 'center',
