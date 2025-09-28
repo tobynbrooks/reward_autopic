@@ -111,6 +111,8 @@ RedemptionTiers: [
 ## 🚀 Getting Started
 
 ### 📱 Mobile App Development
+
+#### Using Expo CLI (Recommended for Development)
 ```bash
 # Install dependencies
 npm install
@@ -119,15 +121,40 @@ npm install
 npm start
 
 # Run on specific platform
-npm run ios
-npm run android
-npm run web
+npx expo run:ios
+npx expo run:android
+npx expo run:web
 ```
+
+#### Using Xcode (iOS Development)
+For iOS development and debugging, you can also run the app directly in Xcode:
+
+```bash
+# 1. Install iOS dependencies (CocoaPods)
+cd ios
+pod install
+
+# 2. Open the workspace in Xcode
+open TyreRewards.xcworkspace
+```
+
+**Xcode Setup Steps:**
+1. **Open the workspace**: Always open `TyreRewards.xcworkspace` (not the .xcodeproj file)
+2. **Select target**: Choose "TyreRewards" as the target scheme
+3. **Select simulator**: Choose your preferred iOS simulator (iPhone 15, iPhone 14, etc.)
+4. **Build and run**: Press `Cmd + R` or click the play button
+
+**Important Notes:**
+- The workspace file (`TyreRewards.xcworkspace`) includes all CocoaPods dependencies
+- Make sure you have Xcode 15+ installed for React Native compatibility
+- If you encounter build issues, try cleaning the build folder (`Cmd + Shift + K`)
+- For device testing, ensure your Apple Developer account is configured in Xcode
 
 ### 💻 Admin Panel Development
 ```bash
 # Navigate to admin panel
 cd admin-panel
+
 
 # Install dependencies
 npm install

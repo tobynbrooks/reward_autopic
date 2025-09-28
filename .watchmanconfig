@@ -1,0 +1,9 @@
+{
+  "ignore_dirs": [
+    "admin-panel",
+    "node_modules",
+    ".git",
+    ".expo",
+    "reward-app/node_modules"
+  ]
+}
