@@ -108,26 +108,28 @@ RedemptionTiers: [
 ]
 ```
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 📱 Mobile App Development
+### 📱 Mobile App Development (Recommended)
 
-#### Using Expo CLI (Recommended for Development)
+**Two-terminal setup for full development:**
+
 ```bash
-# Install dependencies
-npm install
-
-# Start Expo development server
+# Terminal 1: Start Metro bundler (development server)
 npm start
 
-# Run on specific platform
+# Terminal 2: Build and run iOS app
 npx expo run:ios
-npx expo run:android
-npx expo run:web
 ```
 
-#### Using Xcode (iOS Development)
-For iOS development and debugging, you can also run the app directly in Xcode:
+**What this does:**
+- **Terminal 1**: Serves your JavaScript code with hot reload
+- **Terminal 2**: Builds the iOS app and installs it on simulator/device
+- **Result**: App runs with live debugging and console logs
+
+### 💻 Alternative: Xcode Development
+
+For native iOS debugging and device testing:
 
 ```bash
 # 1. Install iOS dependencies (CocoaPods)
@@ -150,11 +152,30 @@ open TyreRewards.xcworkspace
 - If you encounter build issues, try cleaning the build folder (`Cmd + Shift + K`)
 - For device testing, ensure your Apple Developer account is configured in Xcode
 
-### 💻 Admin Panel Development
-```bash
-# Navigate to admin panel
-cd admin-panel
+### 🔧 Troubleshooting
 
+**If you get port conflicts:**
+```bash
+# Kill processes on ports 8081/8082
+lsof -ti:8081 | xargs kill -9
+lsof -ti:8082 | xargs kill -9
+
+# Then restart
+npm start
+```
+
+**If debugger won't connect:**
+- Reload the app in simulator (`Cmd + D` → "Reload")
+- Check that both terminals are running
+- Console logs appear in Terminal 1 (Metro bundler)
+
+### 💻 Admin Panel Development
+
+**Web-based admin interface for managing users and rewards:**
+
+```bash
+# Navigate to admin panel directory
+cd admin-panel
 
 # Install dependencies
 npm install
@@ -165,6 +186,18 @@ npm run dev
 # Build for production
 npm run build
 ```
+
+**What this does:**
+- **Starts Next.js development server** (usually on http://localhost:3000)
+- **Hot reload** for web development
+- **Admin features**: User management, chat interface, analytics
+- **Connects to same database** as mobile app
+
+**Admin Panel Features:**
+- **User Management**: View users, adjust tyre balances, track activity
+- **Support Dashboard**: Handle conversations, quick actions, response tracking
+- **Analytics**: Business metrics, user trends, performance insights
+- **Quick Actions**: Schedule services, add tyres, apply discounts
 
 ## 🔧 Phase 1 Implementation
 
