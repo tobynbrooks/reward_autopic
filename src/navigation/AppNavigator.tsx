@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import HomeScreen from '../screens/HomeScreen';
 import RewardsScreen from '../screens/RewardsScreen';
-import ChatScreen from '../screens/ChatScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -49,16 +48,6 @@ const TabNavigator = () => (
           <MaterialIcons name="card-giftcard" size={size} color={color} />
         ),
         tabBarLabel: 'Rewards',
-      }}
-    />
-    <Tab.Screen
-      name="Chat"
-      component={ChatScreen}
-      options={{
-        tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="chat" size={size} color={color} />
-        ),
-        tabBarLabel: 'Support',
       }}
     />
     <Tab.Screen

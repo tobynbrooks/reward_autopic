@@ -29,26 +29,6 @@ export interface RewardTier {
   benefits: string[];
 }
 
-// Chat types for future implementation
-export interface Message {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  content: string;
-  type: 'text' | 'image' | 'system';
-  createdAt: string;
-  isFromAdmin: boolean;
-}
-
-export interface Conversation {
-  id: string;
-  userId: string;
-  title?: string;
-  status: 'active' | 'closed';
-  lastMessageAt: string;
-  createdAt: string;
-  unreadCount: number;
-}
 
 // Onboarding types
 export interface OnboardingData {
@@ -68,7 +48,6 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Home: undefined;
   Rewards: undefined;
-  Chat: undefined;
   Profile: undefined;
 };
 
@@ -92,16 +71,6 @@ export interface Database {
         Row: TyreTransaction;
         Insert: Omit<TyreTransaction, 'id' | 'createdAt'>;
         Update: Partial<Omit<TyreTransaction, 'id' | 'createdAt'>>;
-      };
-      conversations: {
-        Row: Conversation;
-        Insert: Omit<Conversation, 'id' | 'createdAt' | 'lastMessageAt'>;
-        Update: Partial<Omit<Conversation, 'id' | 'createdAt'>>;
-      };
-      messages: {
-        Row: Message;
-        Insert: Omit<Message, 'id' | 'createdAt'>;
-        Update: Partial<Omit<Message, 'id' | 'createdAt'>>;
       };
     };
   };

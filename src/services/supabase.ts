@@ -176,21 +176,6 @@ class SupabaseService {
     return newTransaction;
   }
 
-  // Chat methods (placeholders for future implementation)
-  async getConversations(userId: string): Promise<any[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return [];
-  }
-
-  async createConversation(userId: string, initialMessage: string): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { id: 'mock-conversation', userId, status: 'active' };
-  }
-
-  async sendMessage(conversationId: string, content: string): Promise<any> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { id: 'mock-message', conversationId, content };
-  }
 }
 
 export const supabaseService = new SupabaseService();
