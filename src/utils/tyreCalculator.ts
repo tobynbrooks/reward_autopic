@@ -15,17 +15,110 @@ export interface RedemptionTier {
   description: string;
 }
 
-// Redemption tiers (Starbucks-inspired)
-export const REDEMPTION_TIERS: RedemptionTier[] = [
-  { tyres: 5, discount: 5, description: '£5 off service' },
-  { tyres: 10, discount: 12, description: '£12 off service + free check' },
-  { tyres: 15, discount: 20, description: '£20 off service + priority booking' },
-  { tyres: 25, discount: 35, description: '£35 off service + free MOT' },
-  { tyres: 50, discount: 75, description: '£75 off service + VIP benefits' },
+// Single source of truth for all tyre tiers - used for progress, rewards, and spreadsheet
+export interface TyreTier {
+  tyres: number;
+  label: string;
+  color: string;
+  reward: string;
+  discount: number;
+  description: string;
+}
+
+export const TYRE_TIERS: TyreTier[] = [
+  { tyres: 0, label: 'Welcome', color: '#D1D5DB', reward: 'Start earning!', discount: 0, description: 'Welcome to Tyre Rewards' },
+  { tyres: 5, label: 'Bronze', color: '#CD7F32', reward: '£5 off service', discount: 5, description: '£5 off service' },
+  { tyres: 10, label: 'Silver', color: '#C0C0C0', reward: '£12 off + free check', discount: 12, description: '£12 off service + free check' },
+  { tyres: 15, label: 'Gold', color: '#FFD700', reward: '£20 off + priority', discount: 20, description: '£20 off service + priority booking' },
+  { tyres: 25, label: 'Platinum', color: '#E5E4E2', reward: '£35 off + free MOT', discount: 35, description: '£35 off service + free MOT' },
+  { tyres: 50, label: 'VIP', color: '#50C878', reward: '£75 off + VIP benefits', discount: 75, description: '£75 off service + VIP benefits' },
 ];
+
+// Backward compatibility - can be removed later
+export const REDEMPTION_TIERS = TYRE_TIERS.filter(tier => tier.tyres > 0).map(tier => ({
+  tyres: tier.tyres,
+  discount: tier.discount,
+  description: tier.description
+}));
 
 export const MINIMUM_REDEMPTION_TYRES = 5;
 export const TYRE_TO_POUND_RATIO = 1; // 1 tyre = £1
+
+// Progress calculation functions
+export interface ProgressData {
+  currentTier: TyreTier;
+  nextTier: TyreTier | null;
+  progressToNext: number;
+  tyresNeeded: number;
+  isMaxTier: boolean;
+}
+
+export function getCurrentTier(currentTyres: number): TyreTier {
+  for (let i = TYRE_TIERS.length - 1; i >= 0; i--) {
+    if (currentTyres >= TYRE_TIERS[i].tyres) {
+      return TYRE_TIERS[i];
+    }
+  }
+  return TYRE_TIERS[0];
+}
+
+export function getNextTier(currentTyres: number): TyreTier | null {
+  const currentTier = getCurrentTier(currentTyres);
+  const currentIndex = TYRE_TIERS.findIndex(tier => tier.tyres === currentTier.tyres);
+  return currentIndex < TYRE_TIERS.length - 1 ? TYRE_TIERS[currentIndex + 1] : null;
+}
+
+export function calculateProgress(currentTyres: number): ProgressData {
+  const currentTier = getCurrentTier(currentTyres);
+  const nextTier = getNextTier(currentTyres);
+  const isMaxTier = !nextTier;
+  
+  let progressToNext = 0;
+  let tyresNeeded = 0;
+  
+  if (nextTier) {
+    const tyresInCurrentTier = currentTyres - currentTier.tyres;
+    const tyresNeededForNext = nextTier.tyres - currentTier.tyres;
+    progressToNext = Math.min(100, (tyresInCurrentTier / tyresNeededForNext) * 100);
+    tyresNeeded = nextTier.tyres - currentTyres;
+  } else {
+    progressToNext = 100;
+  }
+
+  return {
+    currentTier,
+    nextTier,
+    progressToNext,
+    tyresNeeded,
+    isMaxTier,
+  };
+}
+
+// Spreadsheet export functions
+export function getTiersForSpreadsheet() {
+  return TYRE_TIERS.map(tier => ({
+    'Tier': tier.label,
+    'Tyres Required': tier.tyres,
+    'Reward': tier.reward,
+    'Discount Amount': `£${tier.discount}`,
+    'Description': tier.description,
+    'Color Code': tier.color,
+  }));
+}
+
+export function exportTiersAsCSV(): string {
+  const headers = ['Tier', 'Tyres Required', 'Reward', 'Discount Amount', 'Description', 'Color Code'];
+  const rows = TYRE_TIERS.map(tier => [
+    tier.label,
+    tier.tyres.toString(),
+    tier.reward,
+    `£${tier.discount}`,
+    tier.description,
+    tier.color
+  ]);
+  
+  return [headers, ...rows].map(row => row.join(',')).join('\n');
+}
 
 /**
  * Calculate tyre value and redemption status

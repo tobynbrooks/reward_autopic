@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,25 +8,74 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
+import TyreProgressBar from '../components/TyreProgressBar';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
-import { 
-  calculateTyreValue, 
-  formatTyres, 
-  formatCurrency,
+import {
+  formatTyres,
   REDEMPTION_TIERS,
-  calculateTyresFromSpending 
+  calculateTyresFromSpending
 } from '../utils/tyreCalculator';
+import { User } from '../types';
+import { supabaseService } from '../services/supabase';
 
 console.log('App loaded successfully!');
 
 const HomeScreen: React.FC = () => {
   const [currentTyres, setCurrentTyres] = useState(8); // Mock user with 8 tyres
   const [spendingAmount, setSpendingAmount] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const calculation = calculateTyreValue(currentTyres);
+  // Load user data and determine if it's first login
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const currentUser = await supabaseService.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          setCurrentTyres(currentUser.tyres);
+          
+          // Check if this is first login by looking for existing login sessions
+          const hasLoggedInBefore = await AsyncStorage.getItem(`hasLoggedIn_${currentUser.id}`);
+          if (!hasLoggedInBefore) {
+            setIsFirstLogin(true);
+            // Mark that user has logged in before
+            await AsyncStorage.setItem(`hasLoggedIn_${currentUser.id}`, 'true');
+          } else {
+            setIsFirstLogin(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserData();
+  }, []);
+
+
+  // Generate personalized welcome message
+  const getWelcomeMessage = () => {
+    if (isLoading) {
+      return '🛞 Welcome to Tyre Rewards';
+    }
+    
+    // Since Supabase isn't linked yet, use dummy name for now
+    const userName = user?.name || 'John';
+    
+    if (isFirstLogin) {
+      return `🛞 Welcome, ${userName}!`;
+    } else {
+      return `🛞 Welcome back, ${userName}!`;
+    }
+  };
 
   const handleCalculateEarning = () => {
     const amount = parseFloat(spendingAmount);
@@ -40,7 +89,7 @@ const HomeScreen: React.FC = () => {
     
     Alert.alert(
       'Tyres Earned!',
-      `Spending £${amount.toFixed(2)} earns ${formatTyres(newTyres)}!\n\nYour new balance: ${formatTyres(totalTyres)} (${formatCurrency(totalTyres)})`,
+      `Spending £${amount.toFixed(2)} earns ${formatTyres(newTyres)}!\n\nYour new balance: ${formatTyres(totalTyres)}`,
       [
         { text: 'Update Balance', onPress: () => setCurrentTyres(totalTyres) },
         { text: 'Cancel', style: 'cancel' }
@@ -75,26 +124,13 @@ const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Balance Widget */}
-        <View style={styles.balanceCard}>
-          <Text style={styles.brandTitle}>Autopic</Text>
-          <Text style={styles.brandSubtitle}>by Best Autocentres</Text>
-          <Text style={styles.balanceTitle}>Your Tyre Balance</Text>
-          <View style={styles.tyreDisplay}>
-            <Text style={styles.tyreIcon}> </Text>
-            <Text style={styles.tyreCount}>{currentTyres}</Text>
-            <Text style={styles.tyreLabel}>{currentTyres === 1 ? 'Tyre' : 'Tyres'}</Text>
-          </View>
-          
-          <View style={styles.statusRow}>
-            {calculation.canRedeem ? (
-              <Text style={styles.canRedeemText}>✅ You can redeem rewards!</Text>
-            ) : (
-              <Text style={styles.cantRedeemText}>
-                Need {calculation.remainingToRedeem} more tyres to redeem
-              </Text>
-            )}
-          </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.welcomeText}>{getWelcomeMessage()}</Text>
+          <Text style={styles.subHeadingText}>You've been collecting like a pro</Text>
+
+          {/* Progress Bar Component */}
+          <TyreProgressBar currentTyres={currentTyres} />
         </View>
 
         {/* Calculator Section */}
@@ -164,61 +200,25 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  balanceCard: {
-    backgroundColor: colors.primary,
-    margin: spacing.md,
-    padding: spacing.lg,
-    borderRadius: borderRadius.xl,
-    ...shadows.lg,
+  header: {
+    backgroundColor: '#00704A', // Starbucks green
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xl,
   },
-  brandTitle: {
-    fontSize: typography.fontSize['2xl'],
+  welcomeText: {
+    fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
     color: colors.white,
     textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  brandSubtitle: {
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  balanceTitle: {
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semiBold,
-    color: colors.white,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  tyreDisplay: {
-    alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  tyreIcon: {
-    fontSize: 40,
     marginBottom: spacing.sm,
   },
-  tyreCount: {
-    fontSize: typography.fontSize['4xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.white,
-  },
-  tyreLabel: {
+  subHeadingText: {
     fontSize: typography.fontSize.base,
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
-  statusRow: {
-    alignItems: 'center',
-  },
-  canRedeemText: {
-    fontSize: typography.fontSize.base,
-    color: colors.accent,
     fontWeight: typography.fontWeight.medium,
-  },
-  cantRedeemText: {
-    fontSize: typography.fontSize.base,
     color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    marginBottom: spacing.lg,
   },
   calculatorCard: {
     backgroundColor: colors.white,
