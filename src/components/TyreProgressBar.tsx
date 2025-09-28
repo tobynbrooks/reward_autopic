@@ -16,36 +16,27 @@ const TyreProgressBar: React.FC<TyreProgressBarProps> = ({ currentTyres }) => {
   const progress = calculateProgress(currentTyres);
   const progressPercentage = Math.min(100, (currentTyres / MAX_TYRES) * 100);
   
-  // Animation setup - separate values for different purposes
+  // Animation setup
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [displayValue, setDisplayValue] = useState(0);
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Animate progress bar with native driver (for better performance)
+    // Animate progress counter
     Animated.timing(animatedValue, {
-      toValue: progressPercentage,
-      duration: 1200,
-      useNativeDriver: true,
-    }).start();
-
-    // Animate counter with a separate animation (non-native)
-    const counterAnimation = new Animated.Value(0);
-    Animated.timing(counterAnimation, {
-      toValue: progressPercentage,
+      toValue: currentTyres,
       duration: 1200,
       useNativeDriver: false,
     }).start();
 
-    const listener = counterAnimation.addListener(({ value }) => {
+    const listener = animatedValue.addListener(({ value }) => {
       setDisplayValue(Math.round(value));
     });
 
-    // Pulse animation for current tier
+    // Pulse animation for milestones
     Animated.sequence([
       Animated.timing(scaleAnim, {
-        toValue: 1.05,
+        toValue: 1.1,
         duration: 300,
         useNativeDriver: true,
       }),
@@ -56,127 +47,95 @@ const TyreProgressBar: React.FC<TyreProgressBarProps> = ({ currentTyres }) => {
       }),
     ]).start();
 
-    // Continuous pulse for progress fill
-    const pulseAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.02,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-    pulseAnimation.start();
-
     return () => {
-      counterAnimation.removeListener(listener);
+      animatedValue.removeListener(listener);
     };
-  }, [progressPercentage, currentTyres]);
+  }, [currentTyres, animatedValue]);
 
-  const progressScale = animatedValue.interpolate({
-    inputRange: [0, 100],
-    outputRange: [0, 1],
+  const progressWidth = animatedValue.interpolate({
+    inputRange: [0, MAX_TYRES],
+    outputRange: ['0%', '100%'],
     extrapolate: 'clamp',
   });
 
   return (
     <View style={styles.container}>
-      {/* Header with current tier and progress */}
+      {/* Clean Header */}
       <View style={styles.header}>
         <View style={styles.tierBadge}>
           <Text style={styles.tierLabel}>{progress.currentTier.label}</Text>
         </View>
-        <Text style={styles.progressPercentage}>{displayValue}%</Text>
+        <Text style={styles.progressValue}>{displayValue} / {MAX_TYRES}</Text>
       </View>
 
-      {/* Modern Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressTrack}>
-          <Animated.View style={[
-            styles.progressFillContainer, 
-            { 
-              transform: [
-                { scaleX: progressScale },
-                { scaleY: pulseAnim }
-              ]
-            }
-          ]}>
-            <LinearGradient
-              colors={['#FFD700', '#FFA500', '#FF8C00']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.progressFill}
+      {/* Segmented Progress Track */}
+      <View style={styles.segmentedTrack}>
+        {/* Background segments */}
+        {MILESTONES.map((milestone, index) => {
+          const segmentWidth = index === 0 ? milestone : milestone - MILESTONES[index - 1];
+          const widthPercentage = (segmentWidth / MAX_TYRES) * 100;
+          const isCompleted = currentTyres >= milestone;
+          
+          return (
+            <View 
+              key={`segment-${index}`}
+              style={[
+                styles.segment,
+                { 
+                  width: `${widthPercentage}%`,
+                  backgroundColor: isCompleted ? 'rgba(255, 215, 0, 0.3)' : 'rgba(255, 255, 255, 0.1)',
+                  marginRight: index < MILESTONES.length - 1 ? 2 : 0,
+                }
+              ]} 
             />
-            {/* Glow effect */}
-            <View style={styles.progressGlow} />
-          </Animated.View>
-        </View>
-
-        {/* Milestones */}
-        <View style={styles.milestones}>
-          {MILESTONES.map((milestone, index) => {
-            const isReached = currentTyres >= milestone;
-            const position = (milestone / MAX_TYRES) * 100;
-            
-            return (
-              <Animated.View 
-                key={index} 
-                style={[
-                  styles.milestone, 
-                  { 
-                    left: `${position}%`,
-                    transform: [{ scale: isReached ? scaleAnim : 1 }]
-                  }
-                ]}
-              >
-                <View style={[
-                  styles.milestoneCircle,
-                  {
-                    backgroundColor: isReached ? '#FFD700' : 'rgba(255, 255, 255, 0.3)',
-                    borderColor: isReached ? '#FFD700' : 'rgba(255, 255, 255, 0.5)',
-                    shadowColor: isReached ? '#FFD700' : 'transparent',
-                  }
-                ]} />
-                <Text style={styles.milestoneLabel}>{milestone}</Text>
-              </Animated.View>
-            );
-          })}
-        </View>
+          );
+        })}
+        
+        {/* Animated gradient overlay */}
+        <Animated.View style={[styles.progressOverlay, { width: progressWidth }]}>
+          <LinearGradient
+            colors={['#FFD700', '#FFA500', '#FF8C00']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.progressGradient}
+          />
+        </Animated.View>
       </View>
 
-      {/* Current Position Indicator */}
-      <Animated.View style={[
-        styles.currentIndicator,
-        { 
-          left: `${Math.max(0, Math.min(100, progressPercentage))}%`,
-          transform: [{ scale: scaleAnim }]
-        }
-      ]}>
-        <View style={styles.indicatorTriangle} />
-        <View style={styles.indicatorBadge}>
-          <Text style={styles.indicatorText}>{currentTyres}</Text>
-        </View>
-      </Animated.View>
+      {/* Clean milestone dots (replaces the complex milestone circles and labels) */}
+      <View style={styles.milestoneIndicators}>
+        {MILESTONES.map((milestone, index) => {
+          const isCompleted = currentTyres >= milestone;
+          const isCurrent = currentTyres < milestone && (index === 0 || currentTyres >= MILESTONES[index - 1]);
+          
+          return (
+            <Animated.View 
+              key={`indicator-${index}`} 
+              style={[
+                styles.milestoneContainer,
+                { transform: [{ scale: isCurrent ? scaleAnim : 1 }] }
+              ]}
+            >
+              <View style={[
+                styles.milestoneDot,
+                {
+                  backgroundColor: isCompleted ? '#FFD700' : isCurrent ? '#60A5FA' : 'rgba(255, 255, 255, 0.3)',
+                  shadowColor: isCompleted ? '#FFD700' : 'transparent',
+                  shadowOpacity: isCompleted ? 0.4 : 0,
+                }
+              ]} />
+            </Animated.View>
+          );
+        })}
+      </View>
 
-      {/* Status Footer */}
-      <View style={styles.footer}>
-        <View style={styles.currentStatus}>
-          <Text style={styles.tyreCount}>{currentTyres}</Text>
-          <Text style={styles.tyreLabel}>Tyres Collected</Text>
-        </View>
-
-        <View style={styles.nextTierInfo}>
-          <Text style={styles.nextTierText}>
-            {progress.nextTier
-              ? `${progress.tyresNeeded} more for ${progress.nextTier.label}`
-              : '🏆 Maximum tier reached!'}
-          </Text>
-        </View>
+      {/* Simple status text (replaces complex footer) */}
+      <View style={styles.statusContainer}>
+        <Text style={styles.statusText}>
+          {progress.nextTier 
+            ? `${progress.tyresNeeded} more tyres for ${progress.nextTier.label}` 
+            : '🏆 Maximum tier reached!'}
+        </Text>
       </View>
     </View>
   );
@@ -194,7 +153,7 @@ const styles = StyleSheet.create({
     ...shadows.lg,
   },
   
-  // Header
+  // Clean Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -216,148 +175,69 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  progressPercentage: {
+  progressValue: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.bold,
     color: colors.white,
   },
 
-  // Progress Bar
-  progressContainer: {
-    position: 'relative',
-    marginBottom: spacing.xl,
-  },
-  progressTrack: {
+  // Segmented Progress Track
+  segmentedTrack: {
     height: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    flexDirection: 'row',
     borderRadius: 6,
     overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  progressFillContainer: {
-    height: '100%',
-    position: 'relative',
-    overflow: 'hidden',
-    transformOrigin: 'left center',
-  },
-  progressFill: {
+  segment: {
     height: '100%',
     borderRadius: 6,
   },
-  progressGlow: {
+  progressOverlay: {
     position: 'absolute',
-    top: -2,
-    left: -2,
-    right: -2,
-    bottom: -2,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
-    borderRadius: 8,
-    opacity: 0.6,
+    top: 0,
+    left: 0,
+    height: '100%',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  progressGradient: {
+    width: '100%',
+    height: '100%',
   },
 
-  // Milestones
-  milestones: {
-    position: 'relative',
-    height: 60,
+  // Clean milestone indicators (replaces complex milestone circles)
+  milestoneIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: spacing.md,
+    paddingHorizontal: 4,
+  },
+  milestoneContainer: {
+    alignItems: 'center',
+  },
+  milestoneDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  // Simple status (replaces complex footer)
+  statusContainer: {
+    alignItems: 'center',
     marginTop: spacing.md,
   },
-  milestone: {
-    position: 'absolute',
-    alignItems: 'center',
-    transform: [{ translateX: -12 }],
-  },
-  milestoneCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 3,
-    marginBottom: spacing.xs,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  milestoneLabel: {
-    fontSize: typography.fontSize.xs,
-    color: colors.white,
-    fontWeight: typography.fontWeight.semiBold,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-
-  // Current Indicator
-  currentIndicator: {
-    position: 'absolute',
-    alignItems: 'center',
-    top: -60,
-    transform: [{ translateX: -20 }],
-  },
-  indicatorTriangle: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderTopWidth: 12,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#FFD700',
-    marginBottom: 4,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  indicatorBadge: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 8,
-  },
-  indicatorText: {
-    fontSize: typography.fontSize.sm,
-    color: '#1F2937',
-    fontWeight: typography.fontWeight.bold,
-  },
-
-  // Footer
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  currentStatus: {
-    alignItems: 'center',
-  },
-  tyreCount: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.white,
-  },
-  tyreLabel: {
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255, 255, 255, 0.7)',
-    marginTop: 2,
-  },
-  nextTierInfo: {
-    flex: 1,
-    marginLeft: spacing.lg,
-  },
-  nextTierText: {
+  statusText: {
     fontSize: typography.fontSize.sm,
     color: 'rgba(255, 255, 255, 0.8)',
     fontWeight: typography.fontWeight.medium,
+    textAlign: 'center',
   },
 });
 
