@@ -115,10 +115,10 @@ RedemptionTiers: [
 **Two-terminal setup for full development:**
 
 ```bash
-# Terminal 1: Start Metro bundler (development server)
+# Terminal 1: Start Metro bundler (development server) from root 
 npm start
 
-# Terminal 2: Build and run iOS app
+# Terminal 2: Build and run iOS app, from root 
 npx expo run:ios
 ```
 
