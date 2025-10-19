@@ -66,7 +66,6 @@ const TabNavigator = () => (
 const AppNavigator = () => {
   const { isAuthenticated, hasCompletedOnboarding } = useAuth();
   
-  console.log('AppNavigator: isAuthenticated =', isAuthenticated, 'hasCompletedOnboarding =', hasCompletedOnboarding);
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

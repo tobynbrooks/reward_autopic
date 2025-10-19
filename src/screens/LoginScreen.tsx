@@ -61,14 +61,11 @@ const LoginScreen: React.FC = () => {
   };
 
   const handleDevLogin = () => {
-    console.log('Dev login button pressed');
     Alert.alert(
       'Dev Login',
       'Bypassing authentication for demo purposes.',
       [{ text: 'Continue', onPress: () => {
-        console.log('Calling login function');
         login(); // This will set isAuthenticated to true and navigate to onboarding/main app
-        console.log('Login function called');
       }}]
     );
   };
@@ -149,7 +146,6 @@ const LoginScreen: React.FC = () => {
           <Button
             title="🚀 Direct Login (Web Test)"
             onPress={() => {
-              console.log('Direct login pressed');
               login();
             }}
             variant="ghost"

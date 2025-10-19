@@ -27,7 +27,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   const login = () => {
-    console.log('AuthContext: login called, setting isAuthenticated to true');
     setIsAuthenticated(true);
   };
 

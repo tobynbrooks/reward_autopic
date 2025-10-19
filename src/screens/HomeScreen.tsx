@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import TyreProgressBar from '../components/TyreProgressBar';
 import ContactUs from '../components/ContactUs';
-import { colors, typography, spacing, borderRadius, shadows, layout } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, layout } from '../styles/theme';
 import {
   formatTyres,
   REDEMPTION_TIERS
@@ -20,7 +20,6 @@ import {
 import { User } from '../types';
 import { supabaseService } from '../services/supabase';
 
-console.log('App loaded successfully!');
 
 const HomeScreen: React.FC = () => {
   const [currentTyres, setCurrentTyres] = useState(8); // Mock user with 8 tyres
@@ -119,7 +118,7 @@ const HomeScreen: React.FC = () => {
 
         {/* Contact Us Section */}
         <View style={styles.section}>
-          <ContactUs onPress={() => console.log('Contact us pressed')} />
+          <ContactUs onPress={() => {}} />
         </View>
 
         {/* Available Redemptions */}
