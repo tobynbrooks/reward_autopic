@@ -10,14 +10,12 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import Button from '../components/Button';
-import Input from '../components/Input';
 import TyreProgressBar from '../components/TyreProgressBar';
+import ContactUs from '../components/ContactUs';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import {
   formatTyres,
-  REDEMPTION_TIERS,
-  calculateTyresFromSpending
+  REDEMPTION_TIERS
 } from '../utils/tyreCalculator';
 import { User } from '../types';
 import { supabaseService } from '../services/supabase';
@@ -26,7 +24,6 @@ console.log('App loaded successfully!');
 
 const HomeScreen: React.FC = () => {
   const [currentTyres, setCurrentTyres] = useState(8); // Mock user with 8 tyres
-  const [spendingAmount, setSpendingAmount] = useState('');
   const [user, setUser] = useState<User | null>(null);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,25 +74,6 @@ const HomeScreen: React.FC = () => {
     }
   };
 
-  const handleCalculateEarning = () => {
-    const amount = parseFloat(spendingAmount);
-    if (isNaN(amount) || amount <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid spending amount');
-      return;
-    }
-    
-    const newTyres = calculateTyresFromSpending(amount);
-    const totalTyres = currentTyres + newTyres;
-    
-    Alert.alert(
-      'Tyres Earned!',
-      `Spending £${amount.toFixed(2)} earns ${formatTyres(newTyres)}!\n\nYour new balance: ${formatTyres(totalTyres)}`,
-      [
-        { text: 'Update Balance', onPress: () => setCurrentTyres(totalTyres) },
-        { text: 'Cancel', style: 'cancel' }
-      ]
-    );
-  };
 
   const handleRedemption = (tier: typeof REDEMPTION_TIERS[0]) => {
     if (currentTyres >= tier.tyres) {
@@ -123,51 +101,37 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.welcomeText}>{getWelcomeMessage()}</Text>
           <Text style={styles.subHeadingText}>You've been collecting like a pro</Text>
+        </View>
 
-          {/* Progress Bar Component */}
+        {/* Progress Bar Component */}
+        <View style={styles.progressSection}>
           <TyreProgressBar currentTyres={currentTyres} />
         </View>
 
-        {/* Calculator Section */}
-        <View style={styles.calculatorCard}>
-          <Text style={styles.sectionTitle}>Tyre Calculator</Text>
-          <Text style={styles.calculatorDescription}>
-            Calculate how many tyres you'll earn from spending
-          </Text>
-          
-          <Input
-            label="Spending Amount (£)"
-            placeholder="Enter amount spent"
-            value={spendingAmount}
-            onChangeText={setSpendingAmount}
-            keyboardType="decimal-pad"
-          />
-          
-          <Button
-            title="Calculate Tyres"
-            onPress={handleCalculateEarning}
-            fullWidth
-          />
-          
-          <Text style={styles.calculatorNote}>
-            💰 Every £1 spent = 1 tyre earned
-          </Text>
+        {/* Contact Us Section */}
+        <View style={styles.contactSection}>
+          <ContactUs onPress={() => console.log('Contact us pressed')} />
         </View>
 
         {/* Available Redemptions */}
         <View style={styles.redemptionsCard}>
           <Text style={styles.sectionTitle}>Redemption Tiers</Text>
-          {REDEMPTION_TIERS.map((tier) => (
+          {REDEMPTION_TIERS.map((tier, index) => (
             <TouchableOpacity
               key={tier.tyres}
               style={[
                 styles.tierRow,
-                currentTyres >= tier.tyres ? styles.tierAvailable : styles.tierLocked
+                currentTyres >= tier.tyres ? styles.tierAvailable : styles.tierLocked,
+                index === REDEMPTION_TIERS.length - 1 && styles.lastTierRow
               ]}
               onPress={() => handleRedemption(tier)}
             >
@@ -200,102 +164,106 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: spacing['2xl'],
+  },
+  progressSection: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing['2xl'],
+  },
+  contactSection: {
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing['2xl'],
+  },
   header: {
     backgroundColor: '#00704A', // Starbucks green
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing['2xl'],
+    paddingBottom: spacing['2xl'],
+    marginBottom: spacing['2xl'],
   },
   welcomeText: {
-    fontSize: typography.fontSize.xl,
+    fontSize: typography.fontSize['2xl'],
     fontWeight: typography.fontWeight.bold,
     color: colors.white,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subHeadingText: {
-    fontSize: typography.fontSize.base,
+    fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.medium,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  calculatorCard: {
-    backgroundColor: colors.white,
-    margin: spacing.md,
-    marginTop: 0,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    ...shadows.md,
   },
   sectionTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
     color: colors.textPrimary,
-    marginBottom: spacing.sm,
-  },
-  calculatorDescription: {
-    fontSize: typography.fontSize.base,
-    color: colors.textSecondary,
-    marginBottom: spacing.lg,
-  },
-  calculatorNote: {
-    fontSize: typography.fontSize.sm,
-    color: colors.accent,
-    textAlign: 'center',
-    marginTop: spacing.md,
-    fontWeight: typography.fontWeight.medium,
+    marginBottom: spacing.xl,
   },
   redemptionsCard: {
     backgroundColor: colors.white,
-    margin: spacing.md,
-    marginTop: 0,
-    marginBottom: spacing.xl,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    ...shadows.md,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing['2xl'],
+    padding: spacing.xl,
+    borderRadius: borderRadius.xl,
+    ...shadows.lg,
   },
   tierRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    borderRadius: borderRadius.md,
-    marginBottom: spacing.sm,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.lg,
+    marginBottom: spacing.lg,
+    minHeight: 72,
   },
   tierAvailable: {
-    backgroundColor: colors.success + '15',
-    borderWidth: 1,
+    backgroundColor: colors.success + '10',
+    borderWidth: 2,
     borderColor: colors.success,
   },
   tierLocked: {
-    backgroundColor: colors.gray100,
+    backgroundColor: colors.gray50,
+    borderWidth: 1,
+    borderColor: colors.gray200,
   },
   tierLeft: {
     flex: 1,
+    paddingRight: spacing.md,
   },
   tierTyres: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.semiBold,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
     color: colors.textPrimary,
     marginBottom: spacing.xs,
   },
   tierDescription: {
-    fontSize: typography.fontSize.sm,
+    fontSize: typography.fontSize.base,
     color: colors.textSecondary,
+    lineHeight: typography.lineHeight.normal * typography.fontSize.base,
   },
   tierRight: {
     alignItems: 'flex-end',
+    minWidth: 80,
   },
   tierAvailableText: {
     fontSize: typography.fontSize.sm,
     color: colors.success,
-    fontWeight: typography.fontWeight.medium,
+    fontWeight: typography.fontWeight.semiBold,
+    backgroundColor: colors.success + '20',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
   },
   tierLockedText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: typography.fontSize.sm,
     color: colors.textTertiary,
+    fontWeight: typography.fontWeight.medium,
+  },
+  lastTierRow: {
+    marginBottom: 0,
   },
 });
 

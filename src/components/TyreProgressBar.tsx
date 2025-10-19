@@ -59,14 +59,15 @@ const TyreProgressBar: React.FC<TyreProgressBarProps> = ({ currentTyres }) => {
   });
 
   return (
-    <View style={styles.container}>
-      {/* Clean Header */}
-      <View style={styles.header}>
-        <View style={styles.tierBadge}>
-          <Text style={styles.tierLabel}>{progress.currentTier.label}</Text>
+    <View style={styles.tileContainer}>
+      <View style={styles.container}>
+        {/* Clean Header */}
+        <View style={styles.header}>
+          <View style={styles.tierBadge}>
+            <Text style={styles.tierLabel}>{progress.currentTier.label}</Text>
+          </View>
+          <Text style={styles.progressValue}>{displayValue} / {MAX_TYRES}</Text>
         </View>
-        <Text style={styles.progressValue}>{displayValue} / {MAX_TYRES}</Text>
-      </View>
 
       {/* Segmented Progress Track */}
       <View style={styles.segmentedTrack}>
@@ -137,20 +138,28 @@ const TyreProgressBar: React.FC<TyreProgressBarProps> = ({ currentTyres }) => {
             : '🏆 Maximum tier reached!'}
         </Text>
       </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  tileContainer: {
+    backgroundColor: '#00704A', // Same green as header banner
+    margin: spacing.md,
+    marginTop: 0,
     marginBottom: spacing.xl,
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    ...shadows.md,
+  },
+  container: {
     position: 'relative',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(0, 112, 74, 0.05)',
     borderRadius: 16,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    ...shadows.lg,
+    borderColor: 'rgba(0, 112, 74, 0.1)',
   },
   
   // Clean Header
