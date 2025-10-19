@@ -145,13 +145,15 @@ const TyreProgressBar: React.FC<TyreProgressBarProps> = ({ currentTyres }) => {
 
 const styles = StyleSheet.create({
   tileContainer: {
-    backgroundColor: '#00704A', // Same green as header banner
-    margin: spacing.md,
-    marginTop: 0,
-    marginBottom: spacing.xl,
+    backgroundColor: colors.primary,
     padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    ...shadows.md,
+    borderRadius: borderRadius.xl,
+    // Enhanced shadow for visibility on dark backgrounds
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 12,
   },
   container: {
     position: 'relative',

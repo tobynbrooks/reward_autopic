@@ -42,13 +42,16 @@ const ContactUs: React.FC<ContactUsProps> = ({ onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary, // Use app's primary green
+    backgroundColor: colors.primary,
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.sm,
-    ...shadows.md,
+    // Enhanced shadow for visibility on dark backgrounds
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 12,
   },
   mainText: {
     fontSize: typography.fontSize.base,

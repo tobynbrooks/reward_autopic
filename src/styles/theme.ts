@@ -175,11 +175,31 @@ export const layout = {
     maxWidth: 400,
     paddingHorizontal: spacing.md,
   },
+  // Standard card layout with consistent padding
   card: {
+    padding: spacing.lg,
+    borderRadius: borderRadius.xl,
+    backgroundColor: colors.cardBackground,
+    ...shadows.md,
+  },
+  // Compact card for nested items
+  cardCompact: {
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     backgroundColor: colors.cardBackground,
-    ...shadows.md,
+    ...shadows.sm,
+  },
+  // Section spacing - use this for consistent gaps between major sections
+  section: {
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  // Header section
+  header: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   button: {
     height: 48,

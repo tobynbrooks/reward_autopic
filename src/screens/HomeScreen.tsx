@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import TyreProgressBar from '../components/TyreProgressBar';
 import ContactUs from '../components/ContactUs';
-import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows, layout } from '../styles/theme';
 import {
   formatTyres,
   REDEMPTION_TIERS
@@ -101,24 +101,24 @@ const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
-        style={styles.scrollView} 
+      {/* Fixed Header */}
+      <View style={styles.header}>
+        <Text style={styles.welcomeText}>{getWelcomeMessage()}</Text>
+        <Text style={styles.subHeadingText}>You've been collecting like a pro</Text>
+      </View>
+
+      <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.welcomeText}>{getWelcomeMessage()}</Text>
-          <Text style={styles.subHeadingText}>You've been collecting like a pro</Text>
-        </View>
-
         {/* Progress Bar Component */}
-        <View style={styles.progressSection}>
+        <View style={styles.section}>
           <TyreProgressBar currentTyres={currentTyres} />
         </View>
 
         {/* Contact Us Section */}
-        <View style={styles.contactSection}>
+        <View style={styles.section}>
           <ContactUs onPress={() => console.log('Contact us pressed')} />
         </View>
 
@@ -165,22 +165,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: spacing['2xl'],
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
-  progressSection: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing['2xl'],
-  },
-  contactSection: {
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing['2xl'],
+  // Use theme layout utilities for consistent spacing
+  section: {
+    ...layout.section,
   },
   header: {
-    backgroundColor: '#00704A', // Starbucks green
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing['2xl'],
-    paddingBottom: spacing['2xl'],
-    marginBottom: spacing['2xl'],
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xl,
   },
   welcomeText: {
     fontSize: typography.fontSize['2xl'],
@@ -192,31 +188,28 @@ const styles = StyleSheet.create({
   subHeadingText: {
     fontSize: typography.fontSize.lg,
     fontWeight: typography.fontWeight.medium,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: colors.textOnPrimary,
     textAlign: 'center',
+    opacity: 0.9,
   },
   sectionTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
     color: colors.textPrimary,
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
+  // Use theme card layout for the redemptions card
   redemptionsCard: {
-    backgroundColor: colors.white,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing['2xl'],
-    padding: spacing.xl,
-    borderRadius: borderRadius.xl,
-    ...shadows.lg,
+    ...layout.card,
+    ...layout.section,
   },
   tierRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.lg,
+    padding: spacing.md,
     borderRadius: borderRadius.lg,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     minHeight: 72,
   },
   tierAvailable: {
