@@ -2,7 +2,7 @@
 
 A comprehensive rewards system inspired by Starbucks, designed for automotive service centers. Users earn "tyres" for every pound spent and can redeem them for discounts and services.
 
-## 📱 Project Structure
+## 📱 Project Structure (original draft may have changed a bit)
 
 ```
 reward_autopic/
